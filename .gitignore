@@ -1,0 +1,30 @@
+# git ignore file
+
+#Executable files#
+.exe
+
+#Visual Studio Files#
+.sln
+.vcxprj
+.suo
+*.exe
+*.ilk
+*.pdb
+*.onetoc2
+*.manifest
+*.res
+*.lastbuildstate
+*.log
+*.rc
+*.cache
+*.deps
+*.obj
+*.tlog
+*.vcxproj
+*.filters
+*.user
+*.ipch
+*.opensdf
+*.sdf
+*.sln
+*.suo
