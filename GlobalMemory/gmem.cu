@@ -11,16 +11,9 @@
 __global__ void SimpleCopy(float *oData, float *iData)
 {
     int xId = blockIdx.x * blockDim.x + threadIdx.x;
-<<<<<<< HEAD
-    oData[xId] = iData[xId];
-=======
-
     oData[xId] = iData[xId];
     oData[xId]++;
 
-
-
->>>>>>> a0306232098295acb82e265fe9494ca688f4ccb8
 }
 
 
