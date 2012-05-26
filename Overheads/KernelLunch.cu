@@ -66,7 +66,7 @@ int main()
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&time,start,stop);
 
-    latency = time/(time*(double)NUMREPEAT);
+    latency = time/(1e3*(double)NUMREPEAT);
 
     printf("kernel lunch overhead is:%0.6f\n",latency);
 }
