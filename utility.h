@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <cmath>
 #include <cuda.h>
 
@@ -12,12 +12,12 @@
 //double measuredTime;
 
 //calculate difference in time between two times
-double timediff(timeval end, timeval start)
-{
-	double ts = start.tv_sec + (start.tv_usec / 1000000.0);
-	double te = end.tv_sec + (end.tv_usec / 1000000.0);
-	return te - ts;
-}
+//double timediff(timeval end, timeval start)
+//{
+//	double ts = start.tv_sec + (start.tv_usec / 1000000.0);
+//	double te = end.tv_sec + (end.tv_usec / 1000000.0);
+//	return te - ts;
+//}
 
 
 void HandleError(cudaError_t errcode,int line)
@@ -38,4 +38,4 @@ void HandleError(cudaError_t errcode,int line)
         		printf("error code=%d error=%s file=%s line=%d \n",errcode,cudaGetErrorString(errcode),__FILE__,__LINE__);\
         		exit(-1);\
         	}\
-}\
+}
