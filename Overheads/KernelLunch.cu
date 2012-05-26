@@ -68,5 +68,5 @@ int main()
 
     latency = time/(1e3*(double)NUMREPEAT);
 
-    printf("kernel lunch overhead is:%0.6f\n",latency);
+    printf("kernel lunch overhead is:%0.10f\n",latency);
 }
