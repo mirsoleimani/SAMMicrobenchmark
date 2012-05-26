@@ -66,6 +66,8 @@ int main()
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&time,start,stop);
 
+    cudaMemcpy(h_oData, d_oData, memSize, cudaMemcpyDeviceToHost);
+
     latency = time/(1.e3*(float)NUMREPEAT);
 
     printf("kernel lunch overhead is:%0.10f\n",latency);
