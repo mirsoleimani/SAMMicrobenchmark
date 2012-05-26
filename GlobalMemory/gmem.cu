@@ -48,4 +48,5 @@ int main()
 
     //cudaEvent_t start, stop;
 
+    return 0;
 }
