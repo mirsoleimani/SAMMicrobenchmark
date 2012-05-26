@@ -9,7 +9,7 @@
 #define MAXBLOCKSIZE 1024
 #define MAXGRIDSIZE 65535
 
-#define NUMREPEAT 100
+#define NUMREPEAT 1000
 
 __global__ void SimpleCopy(float *oData, float *iData)
 {
@@ -66,7 +66,7 @@ int main()
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&time,start,stop);
 
-    latency = time/(1e3*(double)NUMREPEAT);
+    latency = time/(1.e3*(float)NUMREPEAT);
 
     printf("kernel lunch overhead is:%0.10f\n",latency);
 }
