@@ -49,6 +49,8 @@ int main()
     dim3 gridSize = 1;
 
     cudaEvent_t start, stop;
+    float time,latency;
+
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     CUDA_HANDLE_ERROR();
@@ -62,5 +64,9 @@ int main()
 
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&time,start,stop);
 
+    latency = time/(time*(double)NUMREPEAT);
+
+    printf("kernel lunch overhead is:%0.6f\n",latency);
 }
