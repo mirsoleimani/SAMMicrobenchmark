@@ -3,6 +3,7 @@
 #include <cuda.h>
 #include <utility.h>
 
+
 #define DEFAULTMEMSIZE (1<<20)
 
 #define MINBLOCKSIZE 1
@@ -13,8 +14,8 @@
 
 __global__ void SimpleCopy(float *oData, float *iData)
 {
-    int xId = blockIdx.x * blockDim.x + threadIdx.x;
-    oData[xId] = iData[xId]+1000;
+	int xId = blockIdx.x * blockDim.x + threadIdx.x;
+	oData[xId] = iData[xId];
 }
 
 int main()
@@ -58,19 +59,21 @@ int main()
     
     for(int i=0;i<NUMREPEAT;i++)
     {
-        SimpleCopy<<<gridSize,blockSize>>>(h_oData,h_iData);
-        cudaThreadSynchronize();
-        cudaMemcpy(h_oData, d_oData, memSize, cudaMemcpyDeviceToHost);
+        SimpleCopy<<<gridSize,blockSize>>>(d_oData,d_iData);
+	//cudaThreadSynchronize();
     }
 
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
     time=0.0f;
     cudaEventElapsedTime(&time,start,stop);
-
     
+    cudaMemcpy(h_oData, d_oData, memSize, cudaMemcpyDeviceToHost);
+    CUDA_HANDLE_ERROR();
+
+
     time /= 1.e3;
     latency = time/((float)NUMREPEAT);
 
-    printf("kernel lunch overhead is:%0.5f\n",time);
+    printf("kernel lunch overhead is:%0.15f\n",latency);
 }
