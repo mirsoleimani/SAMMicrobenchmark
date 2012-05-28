@@ -64,5 +64,5 @@ int main()
     time /= 1.e3;
     latency = time/((float)NUMREPEAT);
 
-    printf("kernel lunch overhead is:%0.15f\n",latency);
+    printf("memory copy host trasfer lunch overhead is:%0.15f\n",latency);
 }
