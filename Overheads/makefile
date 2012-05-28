@@ -1,8 +1,8 @@
 # Add source files here
-EXECUTABLE	:= kernelLunch.out
+EXECUTABLE	:= memoryCopy.out
 
 # cuda source file
-CUFILES		:= KernelLunch.cu
+CUFILES		:= memoryCopy.cu
 
 # C/C++ source files
 CCFILES		:=

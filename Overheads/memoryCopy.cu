@@ -13,7 +13,7 @@
 #define MAXGRIDSIZE 65535
 
 #define NUMREPEAT 1000000
-#define PINNED 1
+#define PINNED 0
 
 int main()
 {
@@ -89,8 +89,20 @@ int main()
 
     printf("memory copy host trasfer lunch overhead is:%0.15f\n",latency);
 
-    cudaFree(d_iData);
+   if(PINNED)
+   {
+	   cudaFreeHost(d_iData);
+	   cudaFreeHost(d_oData);
+   }
+   else
+   {
+ free(h_iData);
+ free(h_oData);
+
+
+
+   }
+   
+     cudaFree(d_iData);  
     cudaFree(d_oData);
-    free(h_iData);
-    free(h_oData);
 }
