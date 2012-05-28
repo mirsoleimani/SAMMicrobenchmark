@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <cuda.h>
 #include <utility.h>
+#include <cuda_runtime.h>
+#include <device_launch_parameters.h>
 
 
 #define DEFAULTMEMSIZE (1<<2)//4B
@@ -11,17 +13,26 @@
 #define MAXGRIDSIZE 65535
 
 #define NUMREPEAT 1000000
+#define PINNED 1
 
 int main()
 {
     size_t memSize = DEFAULTMEMSIZE;
     size_t nWords = (memSize)/sizeof(float);
-    
+
     //Initialize Host memory
     float *h_iData;
     float *h_oData;
-    h_iData = new float[nWords];
-    h_oData = new float[nWords];
+    if(PINNED)
+    {
+        cudaHostAlloc((void **)&h_iData,memSize,0);
+
+    }
+    else
+    {
+        h_iData = new float[nWords];
+        h_oData = new float[nWords];
+    }
 
     for(unsigned int i=0;i<nWords;i++)
     {
@@ -31,6 +42,7 @@ int main()
     //initialize Device memory
     float *d_iData;
     float *d_oData;
+
     cudaMalloc((void **)&d_iData,memSize);
     CUDA_HANDLE_ERROR();
     cudaMalloc((void **)&d_oData,memSize);
@@ -45,18 +57,25 @@ int main()
     CUDA_HANDLE_ERROR();
 
     cudaEventRecord(start,0);
-    
+
     for(int i=0;i<NUMREPEAT;i++)
     {
-        cudaMemcpy(d_iData, h_iData, memSize, cudaMemcpyHostToDevice);
-	cudaThreadSynchronize();
+        if(PINNED)
+        {
+            cudaMemcpyAsync(d_iData,h_iData,memSize,cudaMemcpyHostToDevice,0);
+        }
+        else
+        {
+            cudaMemcpy(d_iData, h_iData, memSize, cudaMemcpyHostToDevice);
+        }
+        //cudaThreadSynchronize();
     }
 
     cudaEventRecord(stop,0);
-   // cudaEventSynchronize(stop);
+    cudaEventSynchronize(stop);
     time=0.0f;
     cudaEventElapsedTime(&time,start,stop);
-    
+
     //cudaMemcpy(h_oData, d_oData, memSize, cudaMemcpyDeviceToHost);
     //CUDA_HANDLE_ERROR();
 
@@ -65,4 +84,9 @@ int main()
     latency = time/((float)NUMREPEAT);
 
     printf("memory copy host trasfer lunch overhead is:%0.15f\n",latency);
+
+    cudaFree(d_iData);
+    cudaFree(d_oData);
+    free(h_iData);
+    free(h_oData);
 }
