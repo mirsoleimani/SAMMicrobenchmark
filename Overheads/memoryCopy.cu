@@ -58,18 +58,23 @@ int main()
 
     cudaEventRecord(start,0);
 
-    for(int i=0;i<NUMREPEAT;i++)
-    {
+    
         if(PINNED)
         {
+		for(int i=0;i<NUMREPEAT;i++)
+		{
             cudaMemcpyAsync(d_iData,h_iData,memSize,cudaMemcpyHostToDevice,0);
+		}
         }
         else
         {
+		for(int i=0;i<NUMREPEAT;i++)
+		{
             cudaMemcpy(d_iData, h_iData, memSize, cudaMemcpyHostToDevice);
+		}
         }
-        //cudaThreadSynchronize();
-    }
+        cudaThreadSynchronize();
+    
 
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
