@@ -49,11 +49,11 @@ int main()
     for(int i=0;i<NUMREPEAT;i++)
     {
         cudaMemcpy(d_iData, h_iData, memSize, cudaMemcpyHostToDevice);
-	    //cudaThreadSynchronize();
+	cudaThreadSynchronize();
     }
 
     cudaEventRecord(stop,0);
-    cudaEventSynchronize(stop);
+   // cudaEventSynchronize(stop);
     time=0.0f;
     cudaEventElapsedTime(&time,start,stop);
     
