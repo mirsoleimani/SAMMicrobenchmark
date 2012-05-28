@@ -26,7 +26,7 @@ int main()
     if(PINNED)
     {
         cudaHostAlloc((void **)&h_iData,memSize,0);
-
+        cudaHostAlloc((void **)&h_oData,memSize,0);
     }
     else
     {
@@ -36,7 +36,7 @@ int main()
 
     for(unsigned int i=0;i<nWords;i++)
     {
-        h_iData[i]= (float) (i&(0xFF));
+        h_oData[i]= (float) (i&(0xFF));
     }
 
     //initialize Device memory
@@ -62,11 +62,11 @@ int main()
     {
         if(PINNED)
         {
-            cudaMemcpyAsync(d_iData,h_iData,memSize,cudaMemcpyHostToDevice,0);
+            cudaMemcpyAsync(d_iData,h_oData,memSize,cudaMemcpyHostToDevice,0);
         }
         else
         {
-            cudaMemcpy(d_iData, h_iData, memSize, cudaMemcpyHostToDevice);
+            cudaMemcpy(d_iData, h_oData, memSize, cudaMemcpyHostToDevice);
         }
         //cudaThreadSynchronize();
     }
