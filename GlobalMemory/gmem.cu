@@ -38,12 +38,12 @@ __global__ void StrideCopy(float *oData, float *iData,int stride)
 __global__ void StrideAccess(float *oData, float *iData,int nWords)
 {
     //int xId = (blockIdx.x*blockDim.x+threadIdx.x)*stride;
-	int xId=0;
-//	int nElement;
-//	nElement = nWords/stride;
+    int xId=0;
+    //	int nElement;
+    //	nElement = nWords/stride;
     for(int i=0;i<nWords;i++)
     {
-	    xId = iData[xId];
+        xId = iData[xId];
     }
 
     oData[0]=xId;
@@ -79,8 +79,8 @@ void RunStrideAccess(int stride,int nWords, int memSize,int nRepeats)
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
 
-	cudaMemcpy(h_iData, d_oData, memSize, cudaMemcpyDeviceToHost);
-	
+    cudaMemcpy(h_iData, d_oData, memSize, cudaMemcpyDeviceToHost);
+
     time=0.0f;
     cudaEventElapsedTime(&time,start,stop);
 
@@ -106,11 +106,11 @@ void TestLatency()
     CUDA_HANDLE_ERROR();
     cudaMalloc((void **)&d_oData,memSize);
     CUDA_HANDLE_ERROR();
-int stride=2;
-//    for(int stride=1;stride <= nWords/2; stride*=2)
-//    {
-        RunStrideAccess(stride, nWords, memSize, nRepeats);
-//    }
+    int stride=2;
+    //    for(int stride=1;stride <= nWords/2; stride*=2)
+    //    {
+    RunStrideAccess(stride, nWords, memSize, nRepeats);
+    //    }
 
     cudaFree(d_iData);
     cudaFree(d_oData);
@@ -144,7 +144,7 @@ void TestBandwidth()
 
 int main()
 {
-	TestLatency();
+    TestLatency();
 
 
     return 0;
