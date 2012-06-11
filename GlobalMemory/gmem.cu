@@ -106,11 +106,11 @@ void TestLatency()
     CUDA_HANDLE_ERROR();
     cudaMalloc((void **)&d_oData,memSize);
     CUDA_HANDLE_ERROR();
-
-    for(int stride=1;stride <= nWords/2; stride*=2)
-    {
+int stride=2;
+//    for(int stride=1;stride <= nWords/2; stride*=2)
+//    {
         RunStrideAccess(stride, nWords, memSize, nRepeats);
-    }
+//    }
 
     cudaFree(d_iData);
     cudaFree(d_oData);
