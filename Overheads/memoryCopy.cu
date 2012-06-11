@@ -13,7 +13,6 @@
 #define MAXGRIDSIZE 65535
 
 #define NUMREPEAT 1000000
-
 #define PINNED 0
 
 int main()
@@ -59,27 +58,30 @@ int main()
 
     cudaEventRecord(start,0);
 
-    if(PINNED)
-    {
-        for(int i=0;i<NUMREPEAT;i++)
+        if(PINNED)
         {
+		for(int i=0;i<NUMREPEAT;i++)
+		{
             cudaMemcpyAsync(d_iData,h_iData,memSize,cudaMemcpyHostToDevice,0);
+		}
         }
-    }
-    else
-    {
-        for(int i=0;i<NUMREPEAT;i++)
+        else
         {
+		for(int i=0;i<NUMREPEAT;i++)
+		{
             cudaMemcpy(d_iData, h_iData, memSize, cudaMemcpyHostToDevice);
+		}
         }
-    }
-    cudaThreadSynchronize();
-
+//        cudaThreadSynchronize();
+    
 
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
     time=0.0f;
     cudaEventElapsedTime(&time,start,stop);
+
+    //cudaMemcpy(h_oData, d_oData, memSize, cudaMemcpyDeviceToHost);
+    //CUDA_HANDLE_ERROR();
 
 
     time /= 1.e3;
@@ -87,17 +89,20 @@ int main()
 
     printf("memory copy host trasfer lunch overhead is:%0.15f\n",latency);
 
-    if(PINNED)
-    {
-        cudaFreeHost(d_iData);
-        cudaFreeHost(d_oData);
-    }
-    else
-    {
-        free(h_iData);
-        free(h_oData);
-    }
+   if(PINNED)
+   {
+	   cudaFreeHost(d_iData);
+	   cudaFreeHost(d_oData);
+   }
+   else
+   {
+ free(h_iData);
+ free(h_oData);
 
-    cudaFree(d_iData);  
+
+
+   }
+   
+     cudaFree(d_iData);  
     cudaFree(d_oData);
 }
