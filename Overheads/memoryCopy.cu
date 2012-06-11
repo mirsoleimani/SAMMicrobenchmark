@@ -72,7 +72,7 @@ int main()
             cudaMemcpy(d_iData, h_iData, memSize, cudaMemcpyHostToDevice);
 		}
         }
-        cudaThreadSynchronize();
+//        cudaThreadSynchronize();
     
 
     cudaEventRecord(stop,0);
