@@ -37,16 +37,17 @@ __global__ void StrideCopy(float *oData, float *iData,int stride)
 //***StrideAccess_Start***
 __global__ void StrideAccess(float *oData, float *iData,int nWords)
 {
-    //int xId = (blockIdx.x*blockDim.x+threadIdx.x)*stride;
-    int xId=0;
-    //	int nElement;
-    //	nElement = nWords/stride;
-    for(int i=0;i<nWords;i++)
-    {
-        xId = iData[xId];
-    }
-
-    oData[0]=xId;
+    unsigned int xId=0;
+    float sum=0;
+//  for(int j=0;j<5;j++)
+//  {
+   #pragma unrool 512
+   for(int i=0;i<nWords;i++)
+   {
+	xId= iData[xId];
+   }
+   //}
+    oData[0]=xId;	
 }
 //***StrideAccess_End***
 
@@ -71,10 +72,10 @@ void RunStrideAccess(int stride,int nWords, int memSize,int nRepeats)
 
     cudaEventRecord(start,0);
 
-    for(int i=0;i<nRepeats;i++)
-    {
-        StrideAccess<<<1,1>>>(d_oData,d_iData,nWords);
-    }
+//  for(int i=0;i<nRepeats;i++)
+  //{
+       StrideAccess<<<1,1>>>(d_oData,d_iData,nWords);
+   // }
 
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
@@ -85,9 +86,11 @@ void RunStrideAccess(int stride,int nWords, int memSize,int nRepeats)
     cudaEventElapsedTime(&time,start,stop);
 
     time /= 1.e3;
-    latency = time/((float)nRepeats);
+    latency = (time*1.0)/(float)nWords;
+    float clock = latency/7.e-11;
+    
 
-    printf("stride:%d, latency:%0.5f\n",stride,latency);
+    printf("data:%f, time:%f, stride:%d, latency:%0.10f, clock:%f\n",h_iData[0],time,stride,latency,clock);
 
 
 }
@@ -95,7 +98,7 @@ void TestLatency()
 {
     size_t memSize = 128*DEFAULTMEMSIZE;
     size_t nWords = (memSize)/sizeof(float);
-    int nRepeats=10;
+    int nRepeats=20;
 
     //Initialize Host memory
     h_iData = new float[nWords];
