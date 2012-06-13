@@ -48,7 +48,7 @@ __global__ void StrideAccess(float *oData, float *iData,int nWords)
         xId= iData[xId];
     }
 
-    oData[0]=xId;	
+    oData[0]=iData[xId];	
 }
 //***StrideAccess_End***
 
@@ -77,6 +77,7 @@ void RunStrideAccess(int stride,int nWords)
 
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
+    cudaThreadSynchronize();
     CUDA_HANDLE_ERROR();
 
     cudaMemcpy(h_iData, d_oData, nWords*sizeof(float), cudaMemcpyDeviceToHost);
@@ -91,13 +92,13 @@ void RunStrideAccess(int stride,int nWords)
 
     printf("data:%f, time:%f, stride:%d, latency:%0.10f, clocks:%f\n",h_iData[0],time,stride,latency,clocks);
 
-    cudaEventDestroy(start);
-    cudaEventDestroy(stop);
-    CUDA_HANDLE_ERROR();
+    //cudaEventDestroy(start);
+    //cudaEventDestroy(stop);
+    //CUDA_HANDLE_ERROR();
 }
 void TestLatency()
 {
-    size_t memSize = 128*DEFAULTMEMSIZE;
+    size_t memSize = 4*DEFAULTMEMSIZE;
     size_t nWords = (memSize)/sizeof(float);
     int nRepeats=20;
 
@@ -112,7 +113,7 @@ void TestLatency()
     CUDA_HANDLE_ERROR();
 
 
-    for(int stride=1;stride <= nWords/2; stride*=2)
+    for(int stride=1;stride <= nWords; stride*=2)
     {
         RunStrideAccess(stride, nWords);
     }
