@@ -90,7 +90,8 @@ void RunStrideAccess(int stride,int nWords)
 
     printf("data:%f, time:%f, stride:%d, latency:%0.10f, clocks:%f\n",h_iData[0],time,stride,latency,clocks);
 
-
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
 }
 void TestLatency()
 {
