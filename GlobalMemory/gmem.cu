@@ -77,6 +77,7 @@ void RunStrideAccess(int stride,int nWords)
 
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
+    CUDA_HANDLE_ERROR();
 
     cudaMemcpy(h_iData, d_oData, nWords*sizeof(float), cudaMemcpyDeviceToHost);
 
@@ -92,6 +93,7 @@ void RunStrideAccess(int stride,int nWords)
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
+    CUDA_HANDLE_ERROR();
 }
 void TestLatency()
 {
