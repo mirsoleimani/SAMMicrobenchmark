@@ -40,7 +40,7 @@ __global__ void StrideAccess(float *oData, float *iData,int nWords)
     unsigned int xId=0;
     float sum=0;
 
-#pragma unroll 2
+#pragma unroll 1024
     for(int i=0;i<nWords;i++)
     {
         xId= iData[xId];
