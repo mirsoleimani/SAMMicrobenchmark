@@ -12,6 +12,8 @@
 #define MAXBLOCKSIZE 1024
 #define MAXGRIDSIZE 65535
 
+#define CLOCK (7.13e10)
+
 float *h_iData;
 float *h_oData;
 float *d_iData;
@@ -71,10 +73,7 @@ void RunStrideAccess(int stride,int nWords, int memSize,int nRepeats)
 
     cudaEventRecord(start,0);
 
-    //  for(int i=0;i<nRepeats;i++)
-    //{
     StrideAccess<<<1,1>>>(d_oData,d_iData,nWords);
-    // }
 
     cudaEventRecord(stop,0);
     cudaEventSynchronize(stop);
@@ -86,10 +85,10 @@ void RunStrideAccess(int stride,int nWords, int memSize,int nRepeats)
 
     time /= 1.e3;
     latency = (time*1.0)/(float)nWords;
-    float clock = latency/7.e-11;
+    float clocks = latency/CLOCK;
 
 
-    printf("data:%f, time:%f, stride:%d, latency:%0.10f, clock:%f\n",h_iData[0],time,stride,latency,clock);
+    printf("data:%f, time:%f, stride:%d, latency:%0.10f, clocks:%f\n",h_iData[0],time,stride,latency,clocks);
 
 
 }
@@ -142,6 +141,7 @@ void TestBandwidth()
 
     free(h_iData);
     free(h_oData);
+
 }
 
 int main()
