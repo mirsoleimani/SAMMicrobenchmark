@@ -102,10 +102,10 @@ void RunStrideAccess(int stride,int nWords)
 
     time /= 1.e3;
     latency = (time*1.0)/(float)nWords;
-    int clocks = (int) latency/CLOCK;
+    int clocks = (int) (latency*1.0/CLOCK);
 
 
-    printf("data:%f, time:%f, stride:%d, latency:%0.10f, clocks:%d\n",h_iData[0],time,stride,latency,clocks);
+    printf("size:%f, time:%f, stride:%d, latency:%0.10f, clocks:%d\n",nWords*sizeof(float),time,stride,latency,clocks);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
