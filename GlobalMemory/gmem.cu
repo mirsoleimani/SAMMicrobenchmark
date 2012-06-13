@@ -12,7 +12,7 @@
 #define MAXBLOCKSIZE 1024
 #define MAXGRIDSIZE 65535
 
-#define CLOCK (7.13e10)
+#define CLOCK 0.000000000713
 
 float *h_iData;
 float *h_oData;
