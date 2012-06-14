@@ -20,7 +20,7 @@ float *d_iData;
 float *d_oData;
 
 void PrintResult(char *fName,unsigned int *size,unsigned int *stride,
-    float *latency, unsigned int *clock,unsigned int count)
+    unsigned int *latency, unsigned int *clock,unsigned int count)
 {
     FILE *fOut;
     fOut = fopen(fName,"w");
@@ -90,10 +90,10 @@ void RunStrideAccess(int stride,int nWords)
     StrideAccess<<<1,1>>>(d_oData,d_iData,nWords);
 
     cudaEventRecord(stop,0);
+    cudaThreadSynchronize();    
     cudaEventSynchronize(stop);
     CUDA_HANDLE_ERROR();
 
-    cudaThreadSynchronize();    
 
     cudaMemcpy(h_iData, d_oData, nWords*sizeof(float), cudaMemcpyDeviceToHost);
 
@@ -165,10 +165,9 @@ void TestBandwidth(size_t memSize)
 
 int main()
 {
-   // size_t memSize = 128*DEFAULTMEMSIZE;
-    for(size_t memSize=128*DEFAULTMEMSIZE;memSize<=128*DEFAULTMEMSIZE;memSize+=DEFAULTSTEPSIZE)
+    for(size_t memSize=2*1024;memSize<=64*DEFAULTMEMSIZE;memSize*=2)
     {
-        TestLatency(48*1024);
+        TestLatency(memSize);
     }
 
     return 0;
