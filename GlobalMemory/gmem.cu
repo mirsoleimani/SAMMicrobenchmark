@@ -55,7 +55,7 @@ __global__ void StrideAccess(unsigned int *oData, unsigned int *iData,int nWords
     unsigned int xId=0;
     unsigned int start,stop;
 
-#pragma unroll 2048
+#pragma unroll 512
     for(int i=0;i<nWords;i++)
     {
         xId= iData[xId];
@@ -93,7 +93,7 @@ void RunStrideAccess(int stride,int nWords)
 
     cudaEventRecord(stop,0);
     cudaThreadSynchronize();    
-    //cudaEventSynchronize(stop);
+    cudaEventSynchronize(stop);
     CUDA_HANDLE_ERROR();
 
     cudaMemcpy(h_iData, d_oData, nWords*sizeof(unsigned int), cudaMemcpyDeviceToHost);
@@ -107,7 +107,7 @@ void RunStrideAccess(int stride,int nWords)
 
     latency*=1.e9;
     
-    printf("%d\t%f\t%d\t%0.0f\t%d\n",nWords*sizeof(unsigned int),time,stride,latency,clocks);
+    printf("%d\t%f\t%d\t%0.0f\t%d\n",nWords*sizeof(unsigned int),time,stride*sizeof(int),latency,clocks);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -166,10 +166,12 @@ void TestBandwidth(size_t memSize)
 
 int main()
 {
-    for(size_t memSize=2*1024;memSize<=16*DEFAULTMEMSIZE;memSize*=2)
+    for(size_t memSize=1024;memSize<=16*DEFAULTMEMSIZE;memSize*=2)
     {
         TestLatency(memSize);
     }
+    TestLatency(16*1024);
+    TestLatency(768*1024);
 
     return 0;
 }
