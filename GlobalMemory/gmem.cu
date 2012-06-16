@@ -14,10 +14,10 @@
 
 #define CLOCK 0.000000000713
 
-char *h_iData;
-char *h_oData;
-char *d_iData;
-char *d_oData;
+unsigned int *h_iData;
+unsigned int *h_oData;
+unsigned int *d_iData;
+unsigned int *d_oData;
 
 void PrintResult(char *fName,unsigned int *size,unsigned int *stride,
     unsigned int *latency, unsigned int *clock,unsigned int count)
@@ -50,7 +50,7 @@ __global__ void StrideCopy(float *oData, float *iData,int stride)
 //***StrideCopy_End***
 
 //***StrideAccess_Start***
-__global__ void StrideAccess(char *oData, char *iData,int nWords)
+__global__ void StrideAccess(unsigned int *oData, unsigned int *iData,int nWords)
 {
     unsigned int xId=0;
     unsigned int start,stop;
@@ -70,11 +70,11 @@ void RunStrideAccess(int stride,int nWords)
     //***RunStideAccessFill_Start***
     for(unsigned int i=0;i<nWords;i++)
     {
-        h_oData[i]= (char)((i+stride)%nWords);
+        h_oData[i]= ((i+stride)%nWords);
     }
     //***RunStrideAccessFill_End***
 
-    cudaMemcpy(d_iData, h_oData, nWords*sizeof(char), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_iData, h_oData, nWords*sizeof(unsigned int), cudaMemcpyHostToDevice);
 
     dim3 blockSize = dim3(1,1);
     dim3 gridSize = dim3(1,1,1);
@@ -96,7 +96,7 @@ void RunStrideAccess(int stride,int nWords)
     cudaEventSynchronize(stop);
     CUDA_HANDLE_ERROR();
 
-    cudaMemcpy(h_iData, d_oData, nWords*sizeof(char), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_iData, d_oData, nWords*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
     time=0.0f;
     cudaEventElapsedTime(&time,start,stop);
@@ -107,7 +107,7 @@ void RunStrideAccess(int stride,int nWords)
 
     latency*=1.e9;
     
-    printf("%d\t%f\t%d\t%0.0f\t%d\n",nWords*sizeof(char),time,stride,latency,clocks);
+    printf("%d\t%f\t%d\t%0.0f\t%d\n",nWords*sizeof(unsigned int),time,stride,latency,clocks);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -115,11 +115,11 @@ void RunStrideAccess(int stride,int nWords)
 }
 void TestLatency(size_t memSize)
 {
-    size_t nWords = (memSize)/sizeof(char);
+    size_t nWords = (memSize)/sizeof(unsigned int);
 
     //Initialize Host memory
-    h_iData = new char[nWords];
-    h_oData = new char[nWords];
+    h_iData = new unsigned int[nWords];
+    h_oData = new unsigned int[nWords];
 
     //initialize Device memory
     cudaMalloc((void **)&d_iData,memSize);
@@ -144,11 +144,11 @@ void TestLatency(size_t memSize)
 void TestBandwidth(size_t memSize)
 {
     
-    size_t nWords = (memSize)/sizeof(char);
+    size_t nWords = (memSize)/sizeof(unsigned int);
 
     //Initialize Host memory
-    h_iData = new char[nWords];
-    h_oData = new char[nWords];
+    h_iData = new unsigned int[nWords];
+    h_oData = new unsigned int[nWords];
 
     //initialize Device memory
     cudaMalloc((void **)&d_iData,memSize);
