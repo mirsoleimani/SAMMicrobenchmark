@@ -106,9 +106,8 @@ void RunStrideAccess(int stride,int nWords)
     unsigned int clocks = (latency/CLOCK);
 
     latency*=1.e9;
-
-    printf("size:%d, time:%f, stride:%d, latency(ns):%0.0f, clocks:%d\n",
-        nWords*sizeof(char),time,stride,latency,clocks);
+    
+    printf("%d\t%f\t%d\t%0.0f\t%d\n",nWords*sizeof(char),time,stride,latency,clocks);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -128,7 +127,7 @@ void TestLatency(size_t memSize)
     cudaMalloc((void **)&d_oData,memSize);
     CUDA_HANDLE_ERROR();
 
-
+    printf("#size\ttime\tstride\tlatency(ns)\tclocks\n");
     for(int stride=1;stride <= nWords/2; stride*=2)
     {
         RunStrideAccess(stride, nWords);
@@ -167,7 +166,7 @@ void TestBandwidth(size_t memSize)
 
 int main()
 {
-    for(size_t memSize=2*1024;memSize<=64*DEFAULTMEMSIZE;memSize*=2)
+    for(size_t memSize=2*1024;memSize<=16*DEFAULTMEMSIZE;memSize*=2)
     {
         TestLatency(memSize);
     }
