@@ -50,7 +50,7 @@ __global__ void StrideCopy(float *oData, float *iData,int stride)
 //***StrideCopy_End***
 
 //***StrideAccess_Start***
-__global__ void StrideAccess(float *oData, float *iData,int nWords)
+__global__ void StrideAccess(char *oData, char *iData,int nWords)
 {
     unsigned int xId=0;
     unsigned int start,stop;
