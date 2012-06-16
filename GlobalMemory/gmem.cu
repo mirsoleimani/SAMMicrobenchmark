@@ -53,14 +53,18 @@ __global__ void StrideCopy(float *oData, float *iData,int stride)
 __global__ void StrideAccess(float *oData, float *iData,int nWords)
 {
     unsigned int xId=0;
+    unsigned int start,stop;
 
+    start = clock();
 #pragma unroll 512
     for(int i=0;i<nWords;i++)
     {
         xId= iData[xId];
     }
-    
-    oData[0]=iData[xId];	
+    stop = clock();
+
+    oData[0]=iData[xId];
+    oData[1]=stop-start;
 }
 //***StrideAccess_End***
 
@@ -94,7 +98,6 @@ void RunStrideAccess(int stride,int nWords)
     cudaEventSynchronize(stop);
     CUDA_HANDLE_ERROR();
 
-
     cudaMemcpy(h_iData, d_oData, nWords*sizeof(float), cudaMemcpyDeviceToHost);
 
     time=0.0f;
@@ -103,10 +106,12 @@ void RunStrideAccess(int stride,int nWords)
     time /= 1.e3;
     latency = (time*1.0)/(float)nWords;
     unsigned int clocks = (latency/CLOCK);
+    unsigned int clocks2 = h_oData[1]/(float)nWords;
 
     latency*=1.e9;
 
-    printf("size:%d, time:%f, stride:%d, latency(ns):%0.0f, clocks:%d\n",nWords*sizeof(float),time,stride,latency,clocks);
+    printf("size:%d, time:%f, stride:%d, latency(ns):%0.0f, clocks:%d, clocks2:%d\n",
+        nWords*sizeof(float),time,stride,latency,clocks,clocks2);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
