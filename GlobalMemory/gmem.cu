@@ -92,7 +92,7 @@ void RunStrideAccess(int stride,int nWords)
     StrideAccess<<<1,1>>>(d_oData,d_iData,nWords);
 
     cudaEventRecord(stop,0);
-    cudaThreadSynchronize();    
+    //cudaThreadSynchronize();    
     cudaEventSynchronize(stop);
     CUDA_HANDLE_ERROR();
 
