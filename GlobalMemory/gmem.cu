@@ -89,6 +89,7 @@ void RunStrideAccess(int stride,int nWords)
     cudaEventCreate(&stop);
     CUDA_HANDLE_ERROR();
 
+    
     cudaEventRecord(start,0);
 
     StrideAccess<<<1,1>>>(d_oData,d_iData,nWords);
@@ -106,12 +107,12 @@ void RunStrideAccess(int stride,int nWords)
     time /= 1.e3;
     latency = (time*1.0)/(float)nWords;
     unsigned int clocks = (latency/CLOCK);
-    unsigned int clocks2 = h_oData[1]/(float)nWords;
+    unsigned int clocks2 = h_iData[1]/(float)nWords;
 
     latency*=1.e9;
 
     printf("size:%d, time:%f, stride:%d, latency(ns):%0.0f, clocks:%d, clocks2:%d\n",
-        nWords*sizeof(float),time,stride,latency,clocks,h_oData[1]);
+        nWords*sizeof(float),time,stride,latency,clocks,h_iData[1]);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
