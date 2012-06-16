@@ -144,11 +144,11 @@ void TestLatency(size_t memSize)
 void TestBandwidth(size_t memSize)
 {
     
-    size_t nWords = (memSize)/sizeof(float);
+    size_t nWords = (memSize)/sizeof(char);
 
     //Initialize Host memory
-    h_iData = new float[nWords];
-    h_oData = new float[nWords];
+    h_iData = new char[nWords];
+    h_oData = new char[nWords];
 
     //initialize Device memory
     cudaMalloc((void **)&d_iData,memSize);
