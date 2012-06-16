@@ -55,7 +55,7 @@ __global__ void StrideAccess(char *oData, char *iData,int nWords)
     unsigned int xId=0;
     unsigned int start,stop;
 
-//#pragma unroll 512
+#pragma unroll 2048
     for(int i=0;i<nWords;i++)
     {
         xId= iData[xId];
@@ -92,8 +92,8 @@ void RunStrideAccess(int stride,int nWords)
     StrideAccess<<<1,1>>>(d_oData,d_iData,nWords);
 
     cudaEventRecord(stop,0);
-    //cudaThreadSynchronize();    
-    cudaEventSynchronize(stop);
+    cudaThreadSynchronize();    
+    //cudaEventSynchronize(stop);
     CUDA_HANDLE_ERROR();
 
     cudaMemcpy(h_iData, d_oData, nWords*sizeof(char), cudaMemcpyDeviceToHost);
