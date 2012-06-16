@@ -14,10 +14,10 @@
 
 #define CLOCK 0.000000000713
 
-float *h_iData;
-float *h_oData;
-float *d_iData;
-float *d_oData;
+char *h_iData;
+char *h_oData;
+char *d_iData;
+char *d_oData;
 
 void PrintResult(char *fName,unsigned int *size,unsigned int *stride,
     unsigned int *latency, unsigned int *clock,unsigned int count)
@@ -70,14 +70,14 @@ void RunStrideAccess(int stride,int nWords)
     //***RunStideAccessFill_Start***
     for(unsigned int i=0;i<nWords;i++)
     {
-        h_oData[i]= (float)((i+stride)%nWords);
+        h_oData[i]= (char)((i+stride)%nWords);
     }
     //***RunStrideAccessFill_End***
 
-    cudaMemcpy(d_iData, h_oData, nWords*sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_iData, h_oData, nWords*sizeof(char), cudaMemcpyHostToDevice);
 
-    int blockSize = 256;
-    int gridSize = nWords/blockSize;
+    dim3 blockSize = dim3(1,1);
+    dim3 gridSize = dim3(1,1,1);
 
     cudaEvent_t start, stop;
     float time,latency;
@@ -96,7 +96,7 @@ void RunStrideAccess(int stride,int nWords)
     cudaEventSynchronize(stop);
     CUDA_HANDLE_ERROR();
 
-    cudaMemcpy(h_iData, d_oData, nWords*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_iData, d_oData, nWords*sizeof(char), cudaMemcpyDeviceToHost);
 
     time=0.0f;
     cudaEventElapsedTime(&time,start,stop);
@@ -108,7 +108,7 @@ void RunStrideAccess(int stride,int nWords)
     latency*=1.e9;
 
     printf("size:%d, time:%f, stride:%d, latency(ns):%0.0f, clocks:%d\n",
-        nWords*sizeof(float),time,stride,latency,clocks);
+        nWords*sizeof(char),time,stride,latency,clocks);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -116,11 +116,11 @@ void RunStrideAccess(int stride,int nWords)
 }
 void TestLatency(size_t memSize)
 {
-    size_t nWords = (memSize)/sizeof(float);
+    size_t nWords = (memSize)/sizeof(char);
 
     //Initialize Host memory
-    h_iData = new float[nWords];
-    h_oData = new float[nWords];
+    h_iData = new char[nWords];
+    h_oData = new char[nWords];
 
     //initialize Device memory
     cudaMalloc((void **)&d_iData,memSize);
