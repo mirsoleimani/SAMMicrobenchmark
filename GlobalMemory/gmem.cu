@@ -55,7 +55,7 @@ __global__ void StrideAccess(char *oData, char *iData,int nWords)
     unsigned int xId=0;
     unsigned int start,stop;
 
-#pragma unroll 512
+//#pragma unroll 512
     for(int i=0;i<nWords;i++)
     {
         xId= iData[xId];
