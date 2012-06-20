@@ -6,7 +6,7 @@
 #include <device_launch_parameters.h>
 
 #define DEFAULTMEMSIZE (1<<20)
-#define DEFAULTSTEPSIZE (1<<20)
+#define DEFAULTSTEPSIZE (1<<10)
 
 #define MINBLOCKSIZE 1
 #define MAXBLOCKSIZE 1024
@@ -55,7 +55,7 @@ __global__ void StrideAccess(unsigned int *oData, unsigned int *iData,int nWords
     unsigned int xId=0;
     unsigned int start,stop;
 
-#pragma unroll 512
+#pragma unroll 256
     for(int i=0;i<nWords;i++)
     {
         xId= iData[xId];
@@ -166,12 +166,11 @@ void TestBandwidth(size_t memSize)
 
 int main()
 {
-    for(size_t memSize=1024;memSize<=16*DEFAULTMEMSIZE;memSize*=2)
+	cudaThreadSetCacheConfig(cudaFuncCachePreferL1);
+    for(size_t memSize=8*DEFAULTSTEPSIZE;memSize<=16*DEFAULTMEMSIZE;memSize+=8*DEFAULTSTEPSIZE)
     {
         TestLatency(memSize);
     }
-    TestLatency(16*1024);
-    TestLatency(768*1024);
 
     return 0;
 }
