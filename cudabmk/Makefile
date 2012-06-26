@@ -11,7 +11,8 @@ CCFILES=main.cpp
 CUFILES_sm_10=
 CUFILES_sm_11=
 CUFILES_sm_12=
-CUFILES_sm_13=regfile.cu ksync_uint_dep128.cu pipeline.cu
+CUFILES_sm_13=
+CUFILES_sm_20=regfile.cu ksync_uint_dep128.cu pipeline.cu
 CU_DEPS=instructions.h
 # Hack: Because of the obj/release/%.cu_sm_13_o rule in morerules.mk, a side effect of 
 # listing a .cu file under CUFILES_sm_13 is that it will do a modified compile 
@@ -22,8 +23,8 @@ CU_DEPS=instructions.h
 
 EXECUTABLE=main
 
-all: program diverge sync icache1 icache2 icache3 icache4 cmem global shared texture2 texture4 otherstuff
-
+#all: program diverge sync icache1 icache2 icache3 icache4 cmem global shared texture2 texture4 otherstuff
+all: program diverge sync icache3 icache4 cmem global shared texture2 texture4 otherstuff
 # List of .ptx files to build from .cu files.
 PTX_OUTPUTS= # clock.ptx pipeline.ptx
 
@@ -37,8 +38,8 @@ diverge:
 sync:
 	$(MAKE) -f Makefile-sync
 
-icache1:
-	$(MAKE) -f Makefile-icache1
+#icache1:
+#	$(MAKE) -f Makefile-icache1
 
 icache2:
 	$(MAKE) -f Makefile-icache2

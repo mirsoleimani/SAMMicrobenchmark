@@ -36,9 +36,9 @@
 .SUFFIXES : .cu .cu_dbg_o .c_dbg_o .cpp_dbg_o .cu_rel_o .c_rel_o .cpp_rel_o .cubin
 
 # Add new SM Versions here as devices with new Compute Capability are released
-SM_VERSIONS := sm_10 sm_11 sm_12 sm_13
+SM_VERSIONS := sm_10 sm_11 sm_12 sm_13 sm_20
 
-CUDA_INSTALL_PATH ?= /usr/local/cuda
+CUDA_INSTALL_PATH ?= /usr/local/cuda4.1/cuda
 
 ifdef cuda-install
 	CUDA_INSTALL_PATH := $(cuda-install)
@@ -53,7 +53,7 @@ DARWIN = $(strip $(findstring DARWIN, $(OSUPPER)))
 # Basic directory setup for SDK
 # (override directories only if they are not already defined)
 SRCDIR     ?= 
-ROOTDIR    ?= ..
+ROOTDIR    ?= ../
 ROOTBINDIR ?= $(ROOTDIR)/../bin
 BINDIR     ?= $(ROOTBINDIR)/$(OSLOWER)
 ROOTOBJDIR ?= obj

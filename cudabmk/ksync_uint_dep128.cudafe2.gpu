@@ -1,0 +1,26 @@
+# 211 "/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/stddef.h" 3
+typedef unsigned long size_t;
+#include "crt/device_runtime.h"
+# 2 "ksync_uint_dep128.cu"
+__global__ __var_used__ extern void K_SYNC_UINT_DEP128(unsigned *, unsigned *, unsigned, unsigned, int);
+#include "common_functions.h"
+# 2 "ksync_uint_dep128.cu"
+__global__ __var_used__ void K_SYNC_UINT_DEP128(
+# 2 "ksync_uint_dep128.cu"
+unsigned *ts, 
+# 2 "ksync_uint_dep128.cu"
+unsigned *out, 
+# 2 "ksync_uint_dep128.cu"
+unsigned p1, 
+# 2 "ksync_uint_dep128.cu"
+unsigned p2, 
+# 2 "ksync_uint_dep128.cu"
+int its){
+# 2 "ksync_uint_dep128.cu"
+{
+# 3 "ksync_uint_dep128.cu"
+{
+# 4 "ksync_uint_dep128.cu"
+} 
+# 4 "ksync_uint_dep128.cu"
+}}

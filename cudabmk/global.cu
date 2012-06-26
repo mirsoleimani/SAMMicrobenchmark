@@ -3,13 +3,13 @@
 
 #include "repeat.h"
 
-const int page_size = 4;	// Scale stride and arrays by page size.
+const int page_size = 64;	// Scale stride and arrays by page size.
 
 
-__global__ void global_latency (unsigned int ** my_array, int array_length, int iterations, int ignore_iterations, unsigned long long * duration) {
+__global__ void global_latency (unsigned long ** my_array, int array_length, int iterations, int ignore_iterations, unsigned long long * duration) {
 
 	unsigned int start_time, end_time;
-	unsigned int *j = (unsigned int*)my_array; 
+	unsigned long *j = (unsigned long*)my_array; 
 	volatile unsigned long long sum_time;
 
 	sum_time = 0;
@@ -21,14 +21,14 @@ __global__ void global_latency (unsigned int ** my_array, int array_length, int 
 		}
 
 		start_time = clock();
-		repeat256(j=*(unsigned int **)j;)
+		repeat256(j=*(unsigned long **)j;)
 		end_time = clock();
 
 		sum_time += (end_time - start_time);
 	}
 
-	((unsigned int*)my_array)[array_length] = (unsigned int)j;
-	((unsigned int*)my_array)[array_length+1] = (unsigned int) sum_time;
+	((unsigned long*)my_array)[array_length] = (unsigned long)j;
+	((unsigned long*)my_array)[array_length+1] = (unsigned long) sum_time;
 	duration[0] = sum_time;
 }
 
@@ -44,8 +44,8 @@ int gcf(int a, int b)
 void parametric_measure_global(int N, int iterations, int ignore_iterations, int stride) {
 	
 	int i;
-	unsigned int * h_a;
-	unsigned int ** d_a;
+	unsigned long * h_a;
+	unsigned long ** d_a;
 
 	unsigned long long * duration;
 	unsigned long long * latency;
@@ -55,11 +55,11 @@ void parametric_measure_global(int N, int iterations, int ignore_iterations, int
 	if (N > 241600000) { printf ("OOM.\n"); return; }
 
 	/* allocate arrays on CPU */
-	h_a = (unsigned int *)malloc(sizeof(unsigned int) * (N+2));
+	h_a = (unsigned long *)malloc(sizeof(unsigned long) * (N+2));
 	latency = (unsigned long long *)malloc(sizeof(unsigned long long));
 
 	/* allocate arrays on GPU */
-	cudaMalloc ((void **) &d_a, sizeof(unsigned int) * (N+2));
+	cudaMalloc ((void **) &d_a, sizeof(unsigned long) * (N+2));
 	cudaMalloc ((void **) &duration, sizeof(unsigned long long));
 
    	/* initialize array elements on CPU with pointers into d_a. */
@@ -67,7 +67,7 @@ void parametric_measure_global(int N, int iterations, int ignore_iterations, int
 	int step = gcf (stride, N);	// Optimization: Initialize fewer elements.
 	for (i = 0; i < N; i += step) {
 		// Device pointers are 32-bit on GT200.
-		h_a[i] = ((unsigned int)(uintptr_t)d_a) + ((i + stride) % N)*sizeof(unsigned int);	
+		h_a[i] = ((unsigned long)(uintptr_t)d_a) + ((i + stride) % N)*sizeof(unsigned long);	
 	}
 
 	h_a[N] = 0;
@@ -77,7 +77,7 @@ void parametric_measure_global(int N, int iterations, int ignore_iterations, int
 	cudaThreadSynchronize ();
 
         /* copy array elements from CPU to GPU */
-        cudaMemcpy((void *)d_a, (void *)h_a, sizeof(unsigned int) * N, cudaMemcpyHostToDevice);
+        cudaMemcpy((void *)d_a, (void *)h_a, sizeof(unsigned long) * N, cudaMemcpyHostToDevice);
 
 	cudaThreadSynchronize ();
 
@@ -97,7 +97,7 @@ void parametric_measure_global(int N, int iterations, int ignore_iterations, int
 
 		cudaError_t error_id = cudaGetLastError();
         	if (error_id != cudaSuccess) {
-			printf("Error is %s\n", cudaGetErrorString(error_id));
+			printf("Error in line %d is %s\n",__LINE__, cudaGetErrorString(error_id));
 		}
 
 		/* copy results from GPU to CPU */
@@ -131,8 +131,8 @@ void parametric_measure_global(int N, int iterations, int ignore_iterations, int
    apart. */
 void measure_pagesize(int N, int stride, int offset) {
 	
-	unsigned int ** h_a;
-	unsigned int ** d_a;
+	unsigned long ** h_a;
+	unsigned long ** d_a;
 
 	unsigned long long * duration;
 	unsigned long long * latency;
@@ -146,31 +146,31 @@ void measure_pagesize(int N, int stride, int offset) {
 	if (size > 241600000) { printf ("OOM.\n"); return; }
 
 	/* allocate array on CPU */
-	h_a = (unsigned int **)malloc(4 * size);
+	h_a = (unsigned long **)malloc(4 * size);
 	latency = (unsigned long long *)malloc(sizeof(unsigned long long));
 
 	/* allocate array on GPU */
-	cudaMalloc ((void **) &d_a, sizeof(unsigned int) * size);
+	cudaMalloc ((void **) &d_a, sizeof(unsigned long) * size);
 	cudaMalloc ((void **) &duration, sizeof(unsigned long long));
 
    	/* initialize array elements on CPU */
 
 	for (int i=0;i<N; i++)
-		((unsigned int *)h_a)[i*stride] = ((i*stride + stride)*4) + (uintptr_t) d_a;
+		((unsigned long *)h_a)[i*stride] = ((i*stride + stride)*4) + (uintptr_t) d_a;
 
-	((unsigned int *)h_a)[(N-1)*stride] = ((N*stride + offset)*4) + (uintptr_t) d_a;	//point last element to stride+offset
+	((unsigned long *)h_a)[(N-1)*stride] = ((N*stride + offset)*4) + (uintptr_t) d_a;	//point last element to stride+offset
 
 	for (int i=0;i<N; i++)
-		((unsigned int *)h_a)[(i+N)*stride+offset] = (((i+N)*stride + offset + stride)*4) + (uintptr_t) d_a;
+		((unsigned long *)h_a)[(i+N)*stride+offset] = (((i+N)*stride + offset + stride)*4) + (uintptr_t) d_a;
 
-	((unsigned int *)h_a)[(2*N-1)*stride+offset] = (uintptr_t) d_a;		//wrap around.
+	((unsigned long *)h_a)[(2*N-1)*stride+offset] = (uintptr_t) d_a;		//wrap around.
 	
 
 
         cudaThreadSynchronize ();
 
         /* copy array elements from CPU to GPU */
-        cudaMemcpy((void *)d_a, (void *)h_a, sizeof(unsigned int) * size, cudaMemcpyHostToDevice);
+        cudaMemcpy((void *)d_a, (void *)h_a, sizeof(unsigned long) * size, cudaMemcpyHostToDevice);
         
 	cudaThreadSynchronize ();
 
@@ -234,10 +234,10 @@ void measure_global1() {
 	printf("   stride (bytes), latency (clocks)\n");
 
 
-	N=256;		// 131072;
+	N=2*1024*1024;		// 131072;
 	iterations = 4;
 	stride_upper_bound = N; 
-	for (stride = 1; stride <= (stride_upper_bound) ; stride+=1) {
+	for (stride = 1; stride <= (stride_upper_bound) ; stride*=2) {
 		printf ("  %5d, ", stride*4);
 		parametric_measure_global(N, iterations, 1, stride);
 	}
@@ -250,15 +250,15 @@ void measure_global5() {
 
 	// initialize upper bounds here
 
-	printf("\nGlobal5: Global memory latency for %d KB stride.\n", 512 * page_size/4);
+	printf("\nGlobal5: Global memory latency for %d KB stride.\n", 512 * page_size/8);
 	printf("   Array size (KB), latency (clocks)\n");
 
 
 	iterations = 1;
-	stride = 512 * 1024 / 4;
+	stride = 512 * 1024 / 8;
 	for (N = (1*1024*1024); N <= (16*1024*1024); N += stride) {
-		printf ("   %5d, ", N*4/1024 * page_size/4);
-		parametric_measure_global(N*page_size/4, iterations, 1, stride *page_size/4);
+		printf ("   %5d, ", N*8/1024 );
+		parametric_measure_global(N, iterations, 1, stride *2);
 	}
 }
 
@@ -298,9 +298,10 @@ void measure_global4()
 
 int main() {
 	printf("Assuming page size is %d KB\n", page_size);
-	measure_global1();
-	measure_global4();
+//	measure_global1();
+//	measure_global4();
 	measure_global5();
-	measure_global6();
+//	measure_global6();
+
 	return 0;
 }

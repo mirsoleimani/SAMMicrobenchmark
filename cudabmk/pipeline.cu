@@ -81,7 +81,7 @@ do {													\
 
 #define MEASURE_THROUGHPUT(FUNC)									\
 do {													\
-	Db.x = 512; 											\
+	Db.x = 1024; 											\
 													\
 	printf ("  %s \tthroughput:\t", #FUNC);								\
 	FUNC<<<Dg, Db>>>(d_ts, d_out, 4, 6, 2);								\
