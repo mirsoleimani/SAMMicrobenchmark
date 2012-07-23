@@ -53,7 +53,6 @@ __global__ void StrideCopy(float *oData, float *iData,int stride)
 __global__ void StrideAccess(unsigned int *oData, unsigned int *iData,int nWords)
 {
     unsigned int xId=0;
-    unsigned int start,stop;
 
 #pragma unroll 256
     for(int i=0;i<nWords;i++)
@@ -65,9 +64,11 @@ __global__ void StrideAccess(unsigned int *oData, unsigned int *iData,int nWords
 }
 //***StrideAccess_End***
 
+
+
 void RunStrideAccess(int stride,int nWords)
 {
-    //***RunStideAccessFill_Start***
+    //***RunStrideAccessFill_Start***
     for(unsigned int i=0;i<nWords;i++)
     {
         h_oData[i]= ((i+stride)%nWords);
