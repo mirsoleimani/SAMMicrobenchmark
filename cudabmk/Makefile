@@ -24,7 +24,7 @@ CU_DEPS=instructions.h
 EXECUTABLE=main
 
 #all: program diverge sync icache1 icache2 icache3 icache4 cmem global shared texture2 texture4 otherstuff
-all: program diverge sync icache3 icache4 cmem global shared texture2 texture4 otherstuff
+all: icache1 
 # List of .ptx files to build from .cu files.
 PTX_OUTPUTS= # clock.ptx pipeline.ptx
 
@@ -38,8 +38,8 @@ diverge:
 sync:
 	$(MAKE) -f Makefile-sync
 
-#icache1:
-#	$(MAKE) -f Makefile-icache1
+icache1:
+	$(MAKE) -f Makefile-icache1
 
 icache2:
 	$(MAKE) -f Makefile-icache2
