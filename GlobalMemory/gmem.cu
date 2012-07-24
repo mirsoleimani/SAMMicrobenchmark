@@ -5,8 +5,8 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-#define DEFAULTMEMSIZE (1<<20)
-#define DEFAULTSTEPSIZE (1<<10)
+
+#define DEFAULTMEMSIZE (1<<10)//1KB
 
 #define MINBLOCKSIZE 1
 #define MAXBLOCKSIZE 1024
@@ -50,14 +50,18 @@ __global__ void StrideCopy(float *oData, float *iData,int stride)
 //***StrideCopy_End***
 
 //***StrideAccess_Start***
-__global__ void StrideAccess(unsigned int *oData, unsigned int *iData,int nWords)
+__global__ void StrideAccess(unsigned int *oData, unsigned int *iData, int itr)
 {
     unsigned int xId=0;
+    unsigned int start=0,stop=0;
+    volatile unsigned int sumTime=0;
 
-#pragma unroll 256
-    for(int i=0;i<nWords;i++)
+
+//#pragma unroll 256
+    for(int i=0;i<itr;i++)
     {
-        xId= iData[xId];
+        
+        repeat256(xId= iData[xId];)//dependency
     }
 
     oData[0]=iData[xId];
@@ -66,9 +70,10 @@ __global__ void StrideAccess(unsigned int *oData, unsigned int *iData,int nWords
 
 
 
-void RunStrideAccess(int stride,int nWords)
+void RunStrideAccess(int stride,int nWords, int itr)
 {
     //***RunStrideAccessFill_Start***
+    //Lay out path of memory references in array
     for(unsigned int i=0;i<nWords;i++)
     {
         h_oData[i]= ((i+stride)%nWords);
@@ -90,7 +95,7 @@ void RunStrideAccess(int stride,int nWords)
     
     cudaEventRecord(start,0);
 
-    StrideAccess<<<1,1>>>(d_oData,d_iData,nWords);
+    StrideAccess<<<1,1>>>(d_oData,d_iData,itr);
 
     cudaEventRecord(stop,0);
     cudaThreadSynchronize();    
@@ -103,12 +108,12 @@ void RunStrideAccess(int stride,int nWords)
     cudaEventElapsedTime(&time,start,stop);
 
     time /= 1.e3;
-    latency = (time*1.0)/(float)nWords;
+    latency = (time*1.0)/(float)(itr*256);
     unsigned int clocks = (latency/CLOCK);
 
     latency*=1.e9;
     
-    printf("%d\t%f\t%d\t%0.0f\t%d\n",nWords*sizeof(unsigned int),time,stride*sizeof(int),latency,clocks);
+    printf("%d\t%f\t%d\t%0.0f\t%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -117,6 +122,7 @@ void RunStrideAccess(int stride,int nWords)
 void TestLatency(size_t memSize)
 {
     size_t nWords = (memSize)/sizeof(unsigned int);
+    int itr=10;
 
     //Initialize Host memory
     h_iData = new unsigned int[nWords];
@@ -131,7 +137,7 @@ void TestLatency(size_t memSize)
     printf("#size\ttime\tstride\tlatency(ns)\tclocks\n");
     for(int stride=1;stride <= nWords/2; stride*=2)
     {
-        RunStrideAccess(stride, nWords);
+        RunStrideAccess(stride, nWords,itr);
     }
 
     cudaFree(d_iData);
@@ -168,7 +174,7 @@ void TestBandwidth(size_t memSize)
 int main()
 {
 	cudaThreadSetCacheConfig(cudaFuncCachePreferL1);
-    for(size_t memSize=8*DEFAULTSTEPSIZE;memSize<=16*DEFAULTMEMSIZE;memSize+=8*DEFAULTSTEPSIZE)
+    for(size_t memSize=4*DEFAULTMEMSIZE;memSize<=8*1024*DEFAULTMEMSIZE;memSize*=2)
     {
         TestLatency(memSize);
     }
