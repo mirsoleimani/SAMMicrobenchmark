@@ -122,7 +122,7 @@ void RunStrideAccess(int stride,int nWords, int itr)
 void TestLatency(size_t memSize)
 {
     size_t nWords = (memSize)/sizeof(unsigned int);
-    int itr=100;
+    int itr=500;
 
     //Initialize Host memory
     h_iData = new unsigned int[nWords];
