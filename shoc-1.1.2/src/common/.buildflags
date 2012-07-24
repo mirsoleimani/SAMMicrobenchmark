@@ -1,0 +1,13 @@
+CXX=g++
+CC=g++
+NVCC=/usr/local/cuda4.1/cuda/bin/nvcc
+AR=/usr/bin/ar
+LD=g++
+CPPFLAGS=-I../../src/common -I../../config -I/usr/local/cuda4.1/cuda/include
+CFLAGS=-m64 -g -O2
+CXXFLAGS=-m64 -g -O2
+NVCXXFLAGS=-m64 -g -O2
+LDFLAGS=
+ARFLAGS=rcv
+LIBS=-L../../lib  -lrt
+uname= Linux wave 2.6.35-32-generic #67-Ubuntu SMP Mon Mar 5 19:39:49 UTC 2012 x86_64 GNU/Linux

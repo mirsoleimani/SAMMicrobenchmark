@@ -54,9 +54,9 @@ __global__ void kicache_test4_208 (unsigned int *ts, unsigned int* out, int p1, 
 __global__ void kicache_test4_216 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
 __global__ void kicache_test4_224 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
 __global__ void kicache_test4_232 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
-__global__ void kicache_test4_240 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
-__global__ void kicache_test4_248 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
-__global__ void kicache_test4_256 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
+//__global__ void kicache_test4_240 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
+//__global__ void kicache_test4_248 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
+//__global__ void kicache_test4_256 (unsigned int *ts, unsigned int* out, int p1, int p2, int its);
 
 
 
@@ -151,6 +151,7 @@ void measure_icache()
 			cudaMemcpy(ts, d_ts, sizeof(ts), cudaMemcpyDeviceToHost);
 			
 			sum_time += (ts[1] - ts[0]);
+			
 		}
 		
 		if (failed)
@@ -160,7 +161,7 @@ void measure_icache()
 		else
 		{
 			// Compute average latency over the lifetime of each warp (sum_time), and average throughput of the kernel (sum_max_time).
-			printf ("%.1f ", sum_time/100.0/(p2*64)); fflush(stdout);
+			printf ("%.5f ", sum_time/100.0/(p2*64)); fflush(stdout);
 		}
 		
 		sum_times[p2-1] = sum_time;
@@ -168,7 +169,8 @@ void measure_icache()
 	printf (" (icache = ");
 	for (int last_i=1, i=1;i<32;i++)
 	{
-		if (sum_times[i]/(i+1) > sum_times[last_i]/(last_i+1) *1.33)
+		//printf("sum time %d, %d \n",sum_times[i]/(i+1),sum_times[last_i]/(last_i+1)*1.33);
+		if (sum_times[i]/(i+1) > sum_times[last_i]/(last_i+1) /**1.33*/)
 		{
 			printf ("%.1fKB ", i*0.5);
 			last_i = i;
@@ -179,7 +181,7 @@ void measure_icache()
 	
 	printf ("  2 KB steps: ");
 	Db.x = 1;
-	for (int p2 = 1; p2 <= 32; p2++)
+	for (int p2 = 1; p2 <= 29/*32*/; p2++)
 	{
 		unsigned int sum_time = 0;
 		bool failed = false;
@@ -216,9 +218,9 @@ void measure_icache()
 				case 27: kicache_test4_216 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
 				case 28: kicache_test4_224 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
 				case 29: kicache_test4_232 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
-				case 30: kicache_test4_240 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
-				case 31: kicache_test4_248 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
-				case 32: kicache_test4_256 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
+				//case 30: kicache_test4_240 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
+				//case 31: kicache_test4_248 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
+				//case 32: kicache_test4_256 <<<Dg, Db>>>(d_ts, d_out, 1, p2, 2); break;
 
 			}			
 
@@ -247,9 +249,9 @@ void measure_icache()
 		sum_times[p2-1] = sum_time;
 	}
 	printf (" (icache = ");
-	for (int last_i=1, i=1;i<32;i++)
+	for (int last_i=1, i=1;i<28/*32*/;i++)
 	{
-		if (sum_times[i]/(i+1) > sum_times[last_i]/(last_i+1) *1.33)
+		if (sum_times[i]/(i+1) > sum_times[last_i]/(last_i+1) /**1.33*/)
 		{
 			printf ("%.1fKB ", i*2.0);
 			last_i = i;
@@ -267,7 +269,7 @@ void measure_icache()
 	{
 		printf ("  TPC 0,%d (2 KB steps): ", blk2);
 		int mask = (1<<blk2) | 1;	// Enable two blocks for execution
-		for (int p2 = 1; p2 <= 32; p2++)
+		for (int p2 = 1; p2 <= 28/*32*/; p2++)
 		{
 			unsigned int sum_time = 0;
 			bool failed = false;
@@ -303,10 +305,10 @@ void measure_icache()
 					case 26: kicache_test4_208 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
 					case 27: kicache_test4_216 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
 					case 28: kicache_test4_224 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
-					case 29: kicache_test4_232 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
-					case 30: kicache_test4_240 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
-					case 31: kicache_test4_248 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
-					case 32: kicache_test4_256 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
+					//case 29: kicache_test4_232 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
+					//case 30: kicache_test4_240 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
+					//case 31: kicache_test4_248 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
+					//case 32: kicache_test4_256 <<<Dg2, Db>>>(d_ts, d_out, mask, p2, 2); break;
 
 				}
 
