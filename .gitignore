@@ -1,5 +1,7 @@
 # git ignore file
 *.out
+*.o
+*.d
 #Visual Studio Files#
 *.exe
 *.ilk
