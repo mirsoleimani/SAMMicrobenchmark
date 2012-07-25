@@ -115,15 +115,15 @@ void RunStrideAccess(int stride,int nWords, int itr)
     cudaEventElapsedTime(&time,start,stop);
 
     time /= 1.e3;
-    latency = (time*1.0)/(float)(itr*512);
+    //latency = (time*1.0)/(float)(itr*512);
     //clocks = (latency/CLOCK);
     //latency*=1.e9;
 
     clocks = (float)h_iData[1]/(float)((itr)*512);
-//	latency = clocks*CLOCK;
+	latency = clocks*CLOCK;
 	latency *=1.e9;
 
-    printf("%d,%f,%d,%0.0f,%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks);
+    printf("%d,%0.2f,%d,%0.0f,%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -144,8 +144,8 @@ void TestLatency(size_t memSize)
     cudaMalloc((void **)&d_oData,(nWords+1)*sizeof(int));
     CUDA_HANDLE_ERROR();
 
-    printf("#size,time,stride,latency(ns),clocks\n");
-    for(int stride=1;stride <= nWords/2; stride*=2)
+    printf("#size(b),time(s),stride(b),latency(ns),clocks\n");
+    for(int stride=1;stride <= nWords; stride*=2)
     {
         RunStrideAccess(stride, nWords,itr);
     }
