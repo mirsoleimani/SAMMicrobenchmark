@@ -60,11 +60,15 @@ __global__ void StrideAccess(unsigned int *oData, unsigned int *iData, int itr)
 //#pragma unroll 256
     for(int i=0;i<itr;i++)
     {
-        
+        start = clock();
         repeat256(xId= iData[xId];)//dependency
+        stop = clock();
+
+        sumtime += stop-start;
     }
 
     oData[0]=iData[xId];
+    oData[1]=sumTime;
 }
 //***StrideAccess_End***
 
@@ -80,7 +84,7 @@ void RunStrideAccess(int stride,int nWords, int itr)
     }
     //***RunStrideAccessFill_End***
 
-    cudaMemcpy(d_iData, h_oData, nWords*sizeof(unsigned int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_iData, h_oData, (nWords+1)*sizeof(unsigned int), cudaMemcpyHostToDevice);
 
     dim3 blockSize = dim3(1,1);
     dim3 gridSize = dim3(1,1,1);
@@ -113,7 +117,7 @@ void RunStrideAccess(int stride,int nWords, int itr)
 
     latency*=1.e9;
     
-    printf("%d\t%f\t%d\t%0.0f\t%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks);
+    printf("%d\t%f\t%d\t%0.0f\t%d\t%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks,h_iData[1]);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -126,7 +130,7 @@ void TestLatency(size_t memSize)
 
     //Initialize Host memory
     h_iData = new unsigned int[nWords];
-    h_oData = new unsigned int[nWords];
+    h_oData = new unsigned int[nWords+1];
 
     //initialize Device memory
     cudaMalloc((void **)&d_iData,memSize);
