@@ -60,11 +60,11 @@ extern "C"
 
     for(int i=0;i<itr;i++)
     {
-       // start = clock();
+       start = clock();
         repeat512(xId= iData[xId];)//dependency
-       // stop = clock();
+        stop = clock();
 
-       // sumTime += stop-start;
+        sumTime += stop-start;
     }
 
     oData[0]=iData[xId];
