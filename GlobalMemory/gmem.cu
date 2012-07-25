@@ -50,21 +50,21 @@ __global__ void StrideCopy(float *oData, float *iData,int stride)
 //***StrideCopy_End***
 
 //***StrideAccess_Start***
-__global__ void StrideAccess(unsigned int *oData, unsigned int *iData, int itr)
+extern "C"
+ __global__ void StrideAccess(unsigned int *oData, unsigned int *iData, int itr)
 {
     unsigned int xId=0;
     unsigned int start=0,stop=0;
     volatile unsigned int sumTime=0;
 
 
-//#pragma unroll 256
     for(int i=0;i<itr;i++)
     {
-        start = clock();
-        repeat256(xId= iData[xId];)//dependency
-        stop = clock();
+       // start = clock();
+        repeat512(xId= iData[xId];)//dependency
+       // stop = clock();
 
-        sumtime += stop-start;
+       // sumTime += stop-start;
     }
 
     oData[0]=iData[xId];
@@ -112,12 +112,12 @@ void RunStrideAccess(int stride,int nWords, int itr)
     cudaEventElapsedTime(&time,start,stop);
 
     time /= 1.e3;
-    latency = (time*1.0)/(float)(itr*256);
+    latency = (time*1.0)/(float)(itr*512);
     unsigned int clocks = (latency/CLOCK);
 
     latency*=1.e9;
-    
-    printf("%d\t%f\t%d\t%0.0f\t%d\t%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks,h_iData[1]);
+    int c = (float)h_iData[1]/(float)((itr)*512);
+    printf("%d\t%f\t%d\t%0.0f\t%d\t%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks,c);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -126,16 +126,16 @@ void RunStrideAccess(int stride,int nWords, int itr)
 void TestLatency(size_t memSize)
 {
     size_t nWords = (memSize)/sizeof(unsigned int);
-    int itr=100;
+    int itr=200;
 
     //Initialize Host memory
-    h_iData = new unsigned int[nWords];
+    h_iData = new unsigned int[nWords+1];
     h_oData = new unsigned int[nWords+1];
 
     //initialize Device memory
-    cudaMalloc((void **)&d_iData,memSize);
+    cudaMalloc((void **)&d_iData,(nWords+1)*sizeof(int));
     CUDA_HANDLE_ERROR();
-    cudaMalloc((void **)&d_oData,memSize);
+    cudaMalloc((void **)&d_oData,(nWords+1)*sizeof(int));
     CUDA_HANDLE_ERROR();
 
     printf("#size\ttime\tstride\tlatency(ns)\tclocks\n");
@@ -178,7 +178,7 @@ void TestBandwidth(size_t memSize)
 int main()
 {
 	cudaThreadSetCacheConfig(cudaFuncCachePreferL1);
-    for(size_t memSize=4*DEFAULTMEMSIZE;memSize<=8*1024*DEFAULTMEMSIZE;memSize*=2)
+    for(size_t memSize=4*DEFAULTMEMSIZE;memSize<=512*1024*DEFAULTMEMSIZE;memSize*=2)
     {
         TestLatency(memSize);
     }

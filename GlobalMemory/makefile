@@ -1,6 +1,7 @@
 # Add source files here
 EXECUTABLE	:= gmem.out
-
+CUBINFILE	:= gmem.cubin
+PTXFILE		:= gmem.ptx
 # cuda source file
 CUFILES		:= gmem.cu
 
@@ -21,6 +22,7 @@ CUPTI	   := /home/sam/CUDAToolsSDK/CUPTI
 NVCC       := $(CUDA_INSTALL_PATH)/bin/nvcc 
 CXX	:= g++ -fPIC
 LINK	:= g++ -fPIC
+CUOBJDUMP	:=$(CUDA_INSTALL_PATH)/bin/cuobjdump
 # Includes
 INCLUDES  += -I. -I.. -I$(CUDA_INSTALL_PATH)/include -I$(COMMONDIR)/inc -I$(SHAREDDIR)/inc -I$(CUPTI)/include
 
@@ -35,6 +37,8 @@ NVCCFLAGS       += -gencode arch=compute_20,code=sm_20 -Xptxas -dlcm=ca
 bin: $(CUFILES)
 	$(NVCC) $(NVCCFLAGS) -m64 -o $(EXECUTABLE) $(CUFILES) $(INCLUDES) $(LIB)
 
+ptx: $(CUFILE)
+	$(NVCC) $(NVCCFLAGS) -ptx -m64 -o $(PTXFILE) $(CUFILES) $(INCLUDES) $(LIB)
 
 cubin: $(CUFILES)
-	$(NVCC) $(NVCCFLAGS) -m64 -o $(EXECUTABLE) $(CUFILES) $(INCLUDES) $(LIB) $(CUBIN_ARCH_FLAG)
+	$(NVCC) $(NVCCFLAGS) -m64 -o $(CUBINFILE) $(CUFILES) $(INCLUDES) $(LIB) $(CUBIN_ARCH_FLAG)
