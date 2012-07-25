@@ -21,19 +21,7 @@ unsigned int *h_oData;
 unsigned int *d_iData;
 unsigned int *d_oData;
 
-void PrintResult(char *fName,unsigned int *size,unsigned int *stride,
-    unsigned int *latency, unsigned int *clock,unsigned int count)
-{
-    FILE *fOut;
-    fOut = fopen(fName,"w");
 
-    fprintf(fOut,"#ArraySize(B)\tStride(B)\tlatency(ns)\tclock\n");
-    for(int i=0;i<count;i++)
-    {
-        fprintf(fOut,"%d\t%d\t%d\t%d\n",size[i],stride[i],latency[i],clock[i]);
-    }
-    fclose(fOut);
-}
 //***SimpleCopy_Start***
 __global__ void SimpleCopy(float *oData, float *iData)
 {
@@ -107,7 +95,7 @@ void RunStrideAccess(int stride,int nWords, int itr)
     cudaThreadSynchronize();    
     cudaEventSynchronize(stop);
     CUDA_HANDLE_ERROR();
-
+    
     cudaMemcpy(h_iData, d_oData, nWords*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
     time=0.0f;

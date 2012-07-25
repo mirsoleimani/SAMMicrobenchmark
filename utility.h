@@ -39,3 +39,17 @@ void HandleError(cudaError_t errcode,int line)
         		exit(-1);\
         	}\
 }
+
+void PrintResult(char *fName,unsigned int *size,unsigned int *stride,
+    unsigned int *latency, unsigned int *clock,unsigned int count)
+{
+    FILE *fOut;
+    fOut = fopen(fName,"w");
+
+    fprintf(fOut,"#ArraySize(B)\tStride(B)\tlatency(ns)\tclock\n");
+    for(int i=0;i<count;i++)
+    {
+        fprintf(fOut,"%d\t%d\t%d\t%d\n",size[i],stride[i],latency[i],clock[i]);
+    }
+    fclose(fOut);
+}
