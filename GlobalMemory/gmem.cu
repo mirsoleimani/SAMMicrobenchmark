@@ -14,6 +14,8 @@
 
 #define CLOCK 0.000000000713
 
+#define LOOP 512
+
 unsigned int *h_iData;
 unsigned int *h_oData;
 unsigned int *d_iData;
@@ -55,14 +57,13 @@ extern "C"
 {
     unsigned int xId=0;
     unsigned int start=0,stop=0;
-    volatile unsigned int sumTime=0;
-
+    unsigned int sumTime=0;
 
     for(int i=0;i<itr;i++)
     {
        start = clock();
-        repeat512(xId= iData[xId];)//dependency
-        stop = clock();
+       repeat512(xId= iData[xId];)//dependency
+       stop = clock();
 
         sumTime += stop-start;
     }
@@ -91,6 +92,7 @@ void RunStrideAccess(int stride,int nWords, int itr)
 
     cudaEvent_t start, stop;
     float time,latency;
+    unsigned int clocks;
 
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
@@ -109,15 +111,19 @@ void RunStrideAccess(int stride,int nWords, int itr)
     cudaMemcpy(h_iData, d_oData, nWords*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
     time=0.0f;
+    clocks=0;
     cudaEventElapsedTime(&time,start,stop);
 
     time /= 1.e3;
     latency = (time*1.0)/(float)(itr*512);
-    unsigned int clocks = (latency/CLOCK);
+    //clocks = (latency/CLOCK);
+    //latency*=1.e9;
 
-    latency*=1.e9;
-    int c = (float)h_iData[1]/(float)((itr)*512);
-    printf("%d\t%f\t%d\t%0.0f\t%d\t%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks,c);
+    clocks = (float)h_iData[1]/(float)((itr)*512);
+//	latency = clocks*CLOCK;
+	latency *=1.e9;
+
+    printf("%d,%f,%d,%0.0f,%d\n",nWords*sizeof(int),time,stride*sizeof(int),latency,clocks);
 
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -138,7 +144,7 @@ void TestLatency(size_t memSize)
     cudaMalloc((void **)&d_oData,(nWords+1)*sizeof(int));
     CUDA_HANDLE_ERROR();
 
-    printf("#size\ttime\tstride\tlatency(ns)\tclocks\n");
+    printf("#size,time,stride,latency(ns),clocks\n");
     for(int stride=1;stride <= nWords/2; stride*=2)
     {
         RunStrideAccess(stride, nWords,itr);
@@ -178,7 +184,7 @@ void TestBandwidth(size_t memSize)
 int main()
 {
 	cudaThreadSetCacheConfig(cudaFuncCachePreferL1);
-    for(size_t memSize=4*DEFAULTMEMSIZE;memSize<=512*1024*DEFAULTMEMSIZE;memSize*=2)
+    for(size_t memSize=4*DEFAULTMEMSIZE;memSize<=8*1024*DEFAULTMEMSIZE;memSize+=DEFAULTMEMSIZE)
     {
         TestLatency(memSize);
     }
