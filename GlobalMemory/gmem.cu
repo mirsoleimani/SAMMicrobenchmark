@@ -79,14 +79,17 @@ void RunStrideAccess(int stride,int nWords, int itr)
     dim3 gridSize = dim3(1,1,1);
 
     cudaEvent_t start, stop;
-    float time,latency;
+    float time,elapsedTime,latency;
     unsigned int clocks;
 
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     CUDA_HANDLE_ERROR();
 
-    
+    elapsedTime = 0;
+    int i=0;
+    do
+    {
     cudaEventRecord(start,0);
 
     StrideAccess<<<1,1>>>(d_oData,d_iData,itr);
@@ -103,11 +106,14 @@ void RunStrideAccess(int stride,int nWords, int itr)
     cudaEventElapsedTime(&time,start,stop);
 
     time /= 1.e3;
+    elapsedTime += time;
+    i++;
+    }while(elapsedTime < 10.0);
     //latency = (time*1.0)/(float)(itr*512);
     //clocks = (latency/CLOCK);
     //latency*=1.e9;
 
-    clocks = (float)h_iData[1]/(float)((itr)*LOOP);
+    clocks = (float)h_iData[1]/(float)(i*(itr)*LOOP);
 	latency = clocks*CLOCK;
 	latency *=1.e9;
 
