@@ -107,7 +107,7 @@ void RunStrideAccess(int stride,int nWords, int itr)
     //clocks = (latency/CLOCK);
     //latency*=1.e9;
 
-    clocks = (float)h_iData[1]/(float)((itr)*512);
+    clocks = (float)h_iData[1]/(float)((itr)*LOOP);
 	latency = clocks*CLOCK;
 	latency *=1.e9;
 
@@ -119,7 +119,7 @@ void RunStrideAccess(int stride,int nWords, int itr)
 }
 void TestLatency(size_t memSize)
 {
-    size_t nWords = (memSize)/sizeof(unsigned int);
+    size_t nWords = (memSize)/sizeof(int);
     int itr=200;
 
     //Initialize Host memory
@@ -132,8 +132,9 @@ void TestLatency(size_t memSize)
     cudaMalloc((void **)&d_oData,(nWords+1)*sizeof(int));
     CUDA_HANDLE_ERROR();
 
+
     printf("#size(b),time(s),stride(b),latency(ns),clocks\n");
-    for(int stride=1;stride <= nWords; stride*=2)
+    for(int stride=1;stride <= nWords/2; stride*=2)
     {
         RunStrideAccess(stride, nWords,itr);
     }
@@ -169,13 +170,23 @@ void TestBandwidth(size_t memSize)
 
 }
 
-int main()
+int main(int argc, char **argv)
 {
-	cudaThreadSetCacheConfig(cudaFuncCachePreferL1);
-    for(size_t memSize=4*DEFAULTMEMSIZE;memSize<=8*1024*DEFAULTMEMSIZE;memSize+=DEFAULTMEMSIZE)
-    {
-        TestLatency(memSize);
-    }
+	if(argc > 1)
+	{
+		if(argv[0]=="48")
+		{
+			cudaThreadSetCacheConfig(cudaFuncCachePreferL1);
+		}
+	//	else if(argv[0] == "16")
+	//	{
+	//		cudaThreadSetCacheConfig(cudaFuncCachePreferShared);
+	//	}
+	}
+    //for(size_t memSize=4*DEFAULTMEMSIZE;memSize<=8*1024*DEFAULTMEMSIZE;memSize+=DEFAULTMEMSIZE)
+    //{
+        TestLatency((2*1024*1024));
+    //}
 
     return 0;
 }
